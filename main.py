@@ -2,11 +2,16 @@ import random
 import threading
 from tkinter.messagebox import askokcancel
 import textwrap
+
+import PIL
 import pyperclip
 from customtkinter import *
 from tkinter.filedialog import askopenfilename
 import socket
 import requests
+import qrcode
+
+
 PATH = None
 def get_local_ip():
     try:
@@ -23,7 +28,9 @@ local_ip = get_local_ip()
 if local_ip == None:
     askokcancel("Sorry Didn't work", "An ERROR occurred. Probably your Internet is turned off")
     quit()
-print(local_ip)
+
+
+
 def select_file():
     global PATH
     file = askopenfilename()
@@ -53,7 +60,11 @@ def start():
     link_lbl.configure(text=f"http://{local_ip}:8000/")
     copy_link.bind("<Button-1>", copylink)
     copy_link.configure(text="Click here to copy the link")
+    img = qrcode.make(f"http://{local_ip}:8000/")
 
+    root.img = PIL.ImageTk.PhotoImage(img)
+
+    qr_lbl.configure(image=root.img)
 
 
 def stop_server():
@@ -68,38 +79,59 @@ def stop_server():
     copy_link.configure(text="")
     password_lbl.configure(text="")
     link_lbl.configure(text="")
+    qr_lbl.configure(image="")
+
 
 def copylink(e):
     pyperclip.copy(f"http://{local_ip}:8000/")
 
 set_appearance_mode("auto")
-set_default_color_theme("dark-blue")
+set_default_color_theme("Extreme/extreme.json")
 root = CTk()
-root.geometry("500x600")
-root.title("File Transfer")
-root.configure(fg_color=("#FCF7F8", "#2B3D41"))
-root.resizable(False, False)
+root.geometry("854x600+100+100")
+root.title("File Transferer")
+root.configure()
+#root.resizable(False, False)
 
-select_file_btn = CTkButton(root, text="Select a file", fg_color=("#4C5F6B", "#4C5F6B"), font=("SF Display", 26), width=364, height=58, hover_color=("#2B373E", "#56656F"), command=select_file)
-select_file_btn.place(anchor=NW, x=68, y=89)
 
-file_lbl = CTkLabel(root, text="Choose a file to see the path", font=("SF Display", 26), text_color=("#4C5F6B", "#FFFFFF"))
-file_lbl.place(anchor=CENTER, relx=0.5, y=200)
 
-start_transfer = CTkButton(root, text="Start Transfer", fg_color=("#4C5F6B", "#4C5F6B"), font=("SF Display", 26), width=364, height=58, hover_color=("#2B373E", "#56656F"), command=start, state="disabled")
-start_transfer.place(anchor=NW, x=68, y=256)
+control_panel = CTkFrame(root)
+control_panel.pack(padx=10, pady=10, expand=True, fill="both", side="left")
 
-stop_transfer = CTkButton(root, text="Stop Transfer", fg_color=("#E86252", "#E86252"), font=("SF Display", 26), width=364, height=58, hover_color=("#AD4A3E", "#E28277"), state="disabled", command=stop_server)
-stop_transfer.place(anchor=NW, x=68, y=331)
+QR_panel = CTkFrame(root, width=400)
+QR_panel.pack(padx=(0, 10), pady=10, expand=True, fill="y", side="left")
 
-link_lbl = CTkLabel(root, text="", font=("SF Display", 26), wraplength=364, text_color=("#4C5F6B", "#FFFFFF"))
-link_lbl.place(anchor=CENTER, relx=0.5, y=425)
+qr_lbl = CTkLabel(QR_panel, text="")
+qr_lbl.place(anchor=CENTER, relx=0.5, rely=0.5)
 
-copy_link = CTkLabel(root, text="", font=("SF Display", 26), wraplength=364, text_color=("#E86252", "#E86252"))
-copy_link.place(anchor=CENTER, relx=0.5, y=475)
-#copy_link.bind("<Button-1>", copylink)
+select_file_btn = CTkButton(control_panel, text="Select a file", font=CTkFont(size=26), width=364, height=58, command=select_file)
+select_file_btn.pack(padx=20, pady=20)
 
-password_lbl = CTkLabel(root, text="", font=("SF Display", 26), wraplength=364, text_color=("#4C5F6B", "#FFFFFF"))
-password_lbl.place(anchor=CENTER, relx=0.5, y=527)
+file_lbl = CTkLabel(control_panel, text="Choose a file to see the path", font=CTkFont(size=26))
+file_lbl.pack(padx=20, pady=20)
 
+start_transfer = CTkButton(control_panel, text="Start Transfer", font=CTkFont(size=26), width=364, height=58, command=start, state="disabled")
+start_transfer.pack(padx=20, pady=20)
+
+stop_transfer = CTkButton(control_panel, text="Stop Transfer", fg_color=("#E86252", "#E86252"), font=("SF Display", 26), width=364, height=58, hover_color=("#AD4A3E", "#E28277"), state="disabled", text_color_disabled=("grey40", "grey40"), command=stop_server)
+stop_transfer.pack(padx=20, pady=20)
+
+link_lbl = CTkLabel(control_panel, text="", font=("SF Display", 26), wraplength=364, text_color=("#4C5F6B", "#FFFFFF"))
+link_lbl.pack(padx=20, pady=20)
+
+copy_link = CTkLabel(control_panel, text="", font=("SF Display", 26), wraplength=364, text_color=("#E86252", "#E86252"))
+copy_link.pack(padx=20, pady=10)
+
+password_lbl = CTkLabel(control_panel, text="", font=("SF Display", 26), wraplength=364, text_color=("#4C5F6B", "#FFFFFF"))
+password_lbl.pack(padx=20, pady=10)
+
+def on_closing():
+    try:
+        requests.get(f"http://{local_ip}:8000/shutitdown")
+    except Exception as e:
+        print("Some Kind of error occured. I hope the server has successfully shut done gracefully")
+
+    root.destroy()
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
