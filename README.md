@@ -4,7 +4,7 @@ This is program allows the user to share file from computer to any device connec
 
 # A snippet of the application
 
-![FileTransferer](https://github.com/rigvedmaanas/FileTransferer/assets/77579661/2f44075e-2246-4ab3-a377-0f5cd727bbe1)
+![FileTransferer](https://github.com/rigvedmaanas/FileTransferer/assets/77579661/22f3f44e-a562-48ff-a39e-09a217c67f54)
 
 File Path and a part of IP is redacted 👆
 
@@ -29,3 +29,6 @@ That's It!!! Nothing complicated 😄
 `requests~=2.31.0`
 `customtkinter~=5.2.0`
 `flask~=3.0.0`
+`Pillow~=10.1.0`
+`qrcode~=7.4.2`
+`rumps~=0.4.0`
