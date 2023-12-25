@@ -21,7 +21,7 @@ python3 main.py
 ```
 That's It!!! Nothing complicated 😄
 
-# Dependencies
+## Dependencies
 
 `pyperclip~=1.8.2`
 `requests~=2.31.0`
@@ -47,7 +47,7 @@ Once dependencies are downloaded. Run the app
 python3 MenuBarMain.py
 ```
 
-# Dependencies
+## Dependencies
 
 `pyperclip~=1.8.2`
 `requests~=2.31.0`
